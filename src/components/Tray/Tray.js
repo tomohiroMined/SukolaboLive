@@ -24,7 +24,7 @@ import {
   ChatHighlighted,
 } from './Icons';
 
-export default function Tray({ leaveCall }) {
+export default function Tray({ leaveCall, addHeart }) {
   const callObject = useDaily();
   const { isSharingScreen, startScreenShare, stopScreenShare } = useScreenShare();
 
@@ -75,6 +75,7 @@ export default function Tray({ leaveCall }) {
 
   const sendEmoji= () => {
     callObject.sendAppMessage({ action: 'showEmoji' }, '*');
+    addHeart();
   };
 
 

@@ -90,6 +90,12 @@ export default function App() {
     }
   }, [callObject, appState]);
 
+
+  const addHeart = useCallback(() => {
+    setHearts((prevHearts) => [...prevHearts, Date.now()]); // Each heart will have a unique id
+  }, []);
+  
+
   /**
    * If a room's already specified in the page's URL when the component mounts,
    * join the room.
@@ -225,7 +231,7 @@ export default function App() {
       return (
         <DailyProvider callObject={callObject}>
           <Call />
-          <Tray leaveCall={startLeavingCall} />
+          <Tray leaveCall={startLeavingCall} addHeart={addHeart} />
           {hearts.map((id) => <FlyingHeart key={id} />)} {/* Map through the array and render a heart for each id */}
         </DailyProvider>
       );
