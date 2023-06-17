@@ -5,7 +5,7 @@ function FlyingHeart() {
     const [hearts, setHearts] = useState([]);
   // Function to generate a random position
   const generateRandomPosition = () => {
-    const randomPosition = Math.floor(Math.random() * 101); // Generates a random number between 0 and 100
+    const randomPosition = 80 + Math.floor(Math.random() * 10); // Generates a random number between 0 and 100
     return `${randomPosition}%`; // Convert it to a percentage
   };
 
