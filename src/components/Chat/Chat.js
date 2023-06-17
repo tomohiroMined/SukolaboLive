@@ -11,14 +11,17 @@ export default function Chat({ showChat, toggleChat }) {
 
   const sendAppMessage = useAppMessage({
     onAppMessage: useCallback(
-      (ev) =>
-        setMessages((existingMessages) => [
-          ...existingMessages,
-          {
-            msg: ev.data.msg,
-            name: ev.data.name,
-          },
-        ]),
+      (ev) => {
+        if (ev.data.action !== 'showEmoji') {
+          setMessages((existingMessages) => [
+            ...existingMessages,
+            {
+              msg: ev.data.msg,
+              name: ev.data.name,
+            },
+          ]);
+        }
+      },
       [],
     ),
   });

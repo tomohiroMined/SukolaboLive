@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   useDaily,
   useScreenShare,
@@ -51,6 +51,7 @@ export default function Tray({ leaveCall }) {
     }, [showChat]),
   );
 
+
   const toggleVideo = useCallback(() => {
     callObject.setLocalVideo(mutedVideo);
   }, [callObject, mutedVideo]);
@@ -71,6 +72,11 @@ export default function Tray({ leaveCall }) {
       setNewChatMessage(!newChatMessage);
     }
   };
+
+  const sendEmoji= () => {
+    callObject.sendAppMessage({ action: 'showEmoji' }, '*');
+  };
+
 
   return (
     <div className="tray">
@@ -99,13 +105,12 @@ export default function Tray({ leaveCall }) {
             <Screenshare />
             {isSharingScreen ? 'Stop sharing screen' : 'Share screen'}
           </button>
-          <button onClick={toggleMeetingInformation} type="button">
-            <Info />
-            {showMeetingInformation ? 'Hide info' : 'Show info'}
-          </button>
           <button onClick={toggleChat} type="button">
             {newChatMessage ? <ChatHighlighted /> : <ChatIcon />}
             {showChat ? 'Hide chat' : 'Show chat'}
+          </button>
+          <button onClick={sendEmoji} type="button">
+            send emoji
           </button>
         </div>
         <div className="leave">

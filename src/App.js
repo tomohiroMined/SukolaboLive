@@ -5,13 +5,15 @@ import DailyIframe from '@daily-co/daily-js';
 import { DailyProvider } from '@daily-co/daily-react';
 
 import api from './api';
-import { roomUrlFromPageUrl, pageUrlFromRoomUrl } from './utils';
+import { roomUrlFromPageUrl, pageUrlFromRoomUrl, tokenFromPageUrl, pageUrlFromToken } from './utils';
 
 import HomeScreen from './components/HomeScreen/HomeScreen';
 import Call from './components/Call/Call';
 import Header from './components/Header/Header';
 import Tray from './components/Tray/Tray';
 import HairCheck from './components/HairCheck/HairCheck';
+import FlyingHeart from './components/FlyingHeart/FlyingHeart';
+
 
 /* We decide what UI to show to users based on the state of the app, which is dependent on the state of the call object. */
 const STATE_IDLE = 'STATE_IDLE';
@@ -27,6 +29,8 @@ export default function App() {
   const [roomUrl, setRoomUrl] = useState(null);
   const [callObject, setCallObject] = useState(null);
   const [apiError, setApiError] = useState(false);
+  const [meetingToken, setMeetingToken] = useState(null);
+  const [hearts, setHearts] = useState([]);
 
   /**
    * Create a new call room. This function will return the newly created room URL.
@@ -49,12 +53,13 @@ export default function App() {
   /**
    * We've created a room, so let's start the hair check. We won't be joining the call yet.
    */
-  const startHairCheck = useCallback(async (url) => {
+  const startHairCheck = useCallback(async (url, token) => {
     const newCallObject = DailyIframe.createCallObject();
     setRoomUrl(url);
+    setMeetingToken(token);
     setCallObject(newCallObject);
     setAppState(STATE_HAIRCHECK);
-    await newCallObject.preAuth({ url }); // add a meeting token here if your room is private
+    await newCallObject.preAuth({ url, token }); // add a meeting token here if your room is private
     await newCallObject.startCamera();
   }, []);
 
@@ -91,8 +96,9 @@ export default function App() {
    */
   useEffect(() => {
     const url = roomUrlFromPageUrl();
+    const token = tokenFromPageUrl();
     if (url) {
-      startHairCheck(url);
+      startHairCheck(url, token);
     }
   }, [startHairCheck]);
 
@@ -104,6 +110,28 @@ export default function App() {
     if (pageUrl === window.location.href) return;
     window.history.replaceState(null, null, pageUrl);
   }, [roomUrl]);
+
+
+  /**
+     * show heart emoji flying when receive action message
+     */
+  useEffect(() => {
+    if (!callObject) return;
+
+    function handleAppMessage({ fromId, data }) {
+      if (fromId === callObject.participants().local.session_id) return;
+      if (data && data.action === 'showEmoji') {
+        setHearts((prevHearts) => [...prevHearts, Date.now()]); // Each heart will have a unique id
+      }
+    }
+
+    callObject.on('app-message', handleAppMessage);
+
+    return () => {
+      callObject.off('app-message', handleAppMessage);
+    };
+  }, [callObject]);
+
 
   /**
    * Update app state based on reported meeting state changes.
@@ -198,6 +226,7 @@ export default function App() {
         <DailyProvider callObject={callObject}>
           <Call />
           <Tray leaveCall={startLeavingCall} />
+          {hearts.map((id) => <FlyingHeart key={id} />)} {/* Map through the array and render a heart for each id */}
         </DailyProvider>
       );
     }
