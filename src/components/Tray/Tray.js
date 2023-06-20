@@ -29,7 +29,7 @@ export default function Tray({ leaveCall, addHeart }) {
   const { isSharingScreen, startScreenShare, stopScreenShare } = useScreenShare();
 
   const [showMeetingInformation, setShowMeetingInformation] = useState(false);
-  const [showChat, setShowChat] = useState(false);
+  const [showChat, setShowChat] = useState(true);
   const [newChatMessage, setNewChatMessage] = useState(false);
 
   const localParticipant = useLocalParticipant();
